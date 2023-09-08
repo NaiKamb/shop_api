@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
 from .models import Category, Product
 from .serializers import CategorySerializer, ProductDetailSerializer, ProductListSerializer
 from rest_framework.permissions import IsAdminUser, AllowAny, IsAuthenticated
@@ -11,6 +11,7 @@ from rest_framework.decorators import action
 from review.serializers import LikeSerializer, DislikeSerializer, FavoritsSerializer
 from review.models import Like, Dislike, Favorites
 from rest_framework.response import Response
+import django_filters
 
 class PermissionMixin:
     def get_permissions(self):
@@ -30,6 +31,9 @@ class CategoryView(PermissionMixin, viewsets.ModelViewSet):
 class ProductView(PermissionMixin, viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductDetailSerializer
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['category', 'price', 'in_stock']
+    ordering_filter = ['category', 'price'] 
     
     @action(methods=['POST'], detail=True, permission_classes=[IsAuthenticated])
     def like(self, request, pk=None):
