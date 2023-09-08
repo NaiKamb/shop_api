@@ -15,3 +15,8 @@ class ProductDetailSerializer(ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
+        
+    def validate_price(self, price): #валидация всегда создается в сериализаторах
+        if price <=0:
+            raise ValidationError('Стоимость не может быть 0 или меньше')
+        return price
